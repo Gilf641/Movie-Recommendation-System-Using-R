@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+getwd()
+#read the file
+movie_data <- read.csv('tmdb_5000_movies.csv')
+str(movie_data)
+
+```
+
+```{r}
+#Load all the required libraries
+
+require(tidyverse)
+require(tibble)
+require(scales)
+require(lubridate)
+require(kableExtra)
+require(gridExtra)
+require(jsonlite)
+require(knitr)
+require(ggrepel)
+require(wordcloud)
+require(tidytext)
+    
+```
+
+```{r}
+
+#\\\-------DATA UNDERSTANDING-------
+glimpse(movie_data)
+table(movie_data$genres)
+
+
+#\\\------DATA PREPARATION--------
+
+#' Data in columns like genre, keywords, production companies etc are in JSON Format
+
+
+
+movie_data$keywords <- as.character(movie_data$keywords)
+
+
+keywords <- movie_data %>%    
+  filter(nchar(keywords)>2) %>%         # filter out blank keywords field
+  mutate(                               # create a new field called js containing a LIST of keyword and value pairs
+    js = lapply(keywords, fromJSON)     
+  ) %>%                                 #   called id and name
+  unnest(js) %>%                        # turn each keyword/value pairs in the LIST into a row
+  select(id, title, keyword=name) %>%   # select the columns we want
+  mutate_if(is.character, factor)
+
+keywords
+
+
+movie_data$genres <- as.character(movie_data$genres)
+
+genres <- movie_data %>%
+  filter(nchar(genres)>2) %>%
+  mutate(jss = lapply(genres, fromJSON)) %>%
+  unnest(jss) %>%
+  select(id, name, genres = name) %>%
+  mutate_if(is.character, factor)
+
+genres
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
