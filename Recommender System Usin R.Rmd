@@ -13,6 +13,12 @@ getwd()
 movie_data <- read.csv('tmdb_5000_movies.csv')
 str(movie_data)
 
+
+credits_data <- read.csv('tmdb_5000_credits.csv')
+head(credits_data)
+str(credits_data)
+
+
 ```
 
 ```{r}
@@ -74,6 +80,10 @@ genres
 ```
 
 ```{r}
+
+#
+
+
 
   
 
