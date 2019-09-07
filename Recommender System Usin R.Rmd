@@ -47,7 +47,7 @@ table(movie_data$genres)
 
 #\\\------DATA PREPARATION--------
 
-#' Data in columns like genre, keywords, production companies etc are in JSON Format
+#' Data[Movie Dataset] columns like genre, keywords, production companies etc are in JSON Format
 
 
 
@@ -81,11 +81,37 @@ genres
 
 ```{r}
 
-#
+#\\\\---Data[Credits Data]
+glimpse(credits_data)
+
+
+#split cast and crew columns
+
+credits_data$cast <- as.character(credits_data$cast)
+
+cast <- credits_data %>%
+  filter(nchar(cast)>2) %>%
+  mutate(jsss = lapply(cast, fromJSON)) %>%
+  unnest(jsss) %>%
+  select(-cast, -crew, -credit_id) %>%
+  rename(actor = name, movie_cast_id = cast_id, actor_id = id) %>%
+  mutate_if(is.character, factor)
+
+
+glimpse(cast)
+glimpse(credits_data)
+
+kable(cast %>% filter(actor == 'Leonardo DiCaprio'))
+
+```
+
+```{r}
 
 
 
-  
+
+
+
 
 ```
 
