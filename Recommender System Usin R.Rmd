@@ -152,7 +152,16 @@ glimpse(movies)
 
 ```{r}
 #--- Crew
+#--- Cast
 
+credits_data$crew <- as.character(credits_data$crew)
+crew <- credits_data %>%
+        filter(nchar(crew)>2) %>%
+        mutate(js_5 = lapply(crew, fromJSON)) %>%
+        unnest(js_5) %>%
+        select(-cast, -crew, -credit_id) %>%
+        rename(crew=name, crew_id=id) %>%
+        mutate_if(is.character, factor)
 
 credits_data$crew <- as.character(credits_data$crew)
 
@@ -175,6 +184,7 @@ view(crew)
 # Data Visualization
 esquisse::esquisser(genres1)
 
+glimpse(crew)
 
 library(ggplot2)
 
@@ -187,6 +197,9 @@ ggplot(genres1) +
 
 #continue data viz 
 
+
+```
+```{r}
 
 ```
 
