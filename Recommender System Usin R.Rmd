@@ -15,7 +15,7 @@ str(movie_data)
 
 
 credits_data <- read.csv('tmdb_5000_credits.csv')
-head(credits_data)
+#head(credits_data)
 str(credits_data)
 
 
@@ -130,18 +130,38 @@ for (i in 1:(nrow(cast)-1)){
   }
 
 }
-
-
 write.table(cast, file = 'Cast.csv', sep = ',')
+
+cast <- cast %>% filter(order %in% c(0, 1, 2, 3, 4)) %>%
+#cast <- cast %>% spread(key=order, value=actor)
+        spread(key=order, value=actor) %>%
+        rename(actor_1="0", actor_2="1", actor_3="2", actor_4="3", actor_5="4")
+
+# dataframe with top 5 actors for each movie
+movies <- left_join(movie_data, cast %>% select(id=movie_id, actor_1, actor_2, actor_3, actor_4, actor_5), by = "id")
+glimpse(movies)
+
+
 ```
 
 ```{r}
+#--- Cast
+
+credits_data$crew <- as.character(credits_data$crew)
+crew <- credits_data %>%
+        filter(nchar(crew)>2) %>%
+        mutate(js_5 = lapply(crew, fromJSON)) %>%
+        unnest(js_5) %>%
+        select(-cast, -crew, -credit_id) %>%
+        rename(crew=name, crew_id=id) %>%
+        mutate_if(is.character, factor)
+
+glimpse(crew)
 
 
 
-
-
-
+```
+```{r}
 
 ```
 
