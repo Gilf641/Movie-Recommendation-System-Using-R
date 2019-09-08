@@ -152,10 +152,9 @@ glimpse(movies)
 
 ```{r}
 #--- Crew
-
+#--- Cast
 
 credits_data$crew <- as.character(credits_data$crew)
-
 crew <- credits_data %>%
         filter(nchar(crew)>2) %>%
         mutate(js_5 = lapply(crew, fromJSON)) %>%
@@ -175,9 +174,9 @@ view(crew)
 # Data Visualization
 esquisse::esquisser(genres1)
 
+glimpse(crew)
 
-library(ggplot2)
-
+#Genre Comparision
 ggplot(genres1) +
  aes(x = genres) +
  geom_bar(position = "dodge", fill = "#0d0887") +
@@ -185,8 +184,31 @@ ggplot(genres1) +
  coord_flip() +
  theme_gray()
 
-#continue data viz 
+# 
+esquisse::esquisser(cast)
+str(cast)
+# Actors with most appearances
 
+
+```
+
+```{r}
+
+view(cast)
+view(genres1)
+view(crew)
+view(movie_data)
+
+director_stuff <- crew %>% filter(job == 'Director')
+
+esquisse::esquisser(director_stuff)
+
+
+```
+
+```{r}
+
+summary(crew)
 
 ```
 
