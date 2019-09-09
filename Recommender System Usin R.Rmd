@@ -1,5 +1,4 @@
----
-title: "R Notebook"
+--title: "R Notebook"
 output: html_notebook
 ---
 
@@ -163,6 +162,25 @@ crew <- credits_data %>%
         rename(crew=name, crew_id=id) %>%
         mutate_if(is.character, factor)
 
+credits_data$crew <- as.character(credits_data$crew)
+crew <- credits_data %>%
+        filter(nchar(crew)>2) %>%
+        mutate(js_5 = lapply(crew, fromJSON)) %>%
+        unnest(js_5) %>%
+        select(-cast, -crew, -credit_id) %>%
+        rename(crew=name, crew_id=id) %>%
+        mutate_if(is.character, factor)
+
+
+
+movies1Director <- crew %>% filter(job=="Director") %>% count(movie_id) %>% filter(n==1)
+head(movies1Director)
+
+movie_data <- left_join(movies, crew %>% filter(job=="Director" & movie_id %in% movies1Director$movie_id) %>% select(id=movie_id, director=crew), by = "id")
+
+head(movie_data)
+
+
 glimpse(crew)
 
 view(crew)
@@ -175,6 +193,8 @@ view(crew)
 esquisse::esquisser(genres1)
 
 glimpse(crew)
+
+library(ggplot2)
 
 #Genre Comparision
 ggplot(genres1) +
@@ -209,6 +229,31 @@ esquisse::esquisser(director_stuff)
 ```{r}
 
 summary(crew)
+#continue data viz 
+
+
+
+head(crew)
+table(crew$department)
+
+
+top_dir <- movie_data %>% filter(!is.na(movie_data$director)) %>% count(director) %>% top_n(n= 30)
+
+esquisse::esquisser(top_dir)
+
+ggplot(top_dir) +
+ aes(x = director, weight = n) +
+ geom_bar(fill = "#0c4c8a") +
+ labs(x = "Movie Count", y = "Director", title = "Top Directors") +
+ coord_flip() +
+ theme_minimal()
+
+
+
+
+```
+
+```{r}
 
 ```
 
