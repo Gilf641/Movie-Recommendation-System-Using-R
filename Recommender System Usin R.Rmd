@@ -82,6 +82,29 @@ genres1 <- movie_data %>%
 genres1$genres <- as.factor(genres1$genres)
 str(genres1)
 
+#for a movie there're more than 3 genres. In that case we need to cut that off
+
+genres3 <- genres
+genres3$order <- 0
+genres3$order[1] <- 1
+
+
+for(i in 1:(nrow(genres3)-1)) {
+        if(genres3$id[i+1]!=genres3$id[i]){
+                genres3$order[i+1] <- 1
+        } else {genres3$order[i+1] <- (genres3$order[i])+1}
+}
+
+
+genres3 <- genres3 %>% filter(order < 4) %>%
+        spread(key=order, value=genres) %>%
+        rename(genre_1="1", genre_2="2", genre_3="3")
+
+movie_data <- left_join(movie_data, genres3 %>% select(id, genre_1, genre_2, genre_3), by="id")
+
+
+
+
 ```
 
 ```{r}
@@ -204,11 +227,6 @@ ggplot(genres1) +
  coord_flip() +
  theme_gray()
 
-# 
-esquisse::esquisser(cast)
-str(cast)
-# Actors with most appearances
-
 
 ```
 
@@ -236,17 +254,41 @@ summary(crew)
 head(crew)
 table(crew$department)
 
+#Top Directors
 
-top_dir <- movie_data %>% filter(!is.na(movie_data$director)) %>% count(director) %>% top_n(n= 30)
+top_dir <- movie_data %>% filter(!is.na(movie_data$director)) %>% count(director) %>% top_n(n= 25)
 
 esquisse::esquisser(top_dir)
 
 ggplot(top_dir) +
- aes(x = director, weight = n) +
+ aes(x = reorder(director,n),  weight = n) +
  geom_bar(fill = "#0c4c8a") +
  labs(x = "Movie Count", y = "Director", title = "Top Directors") +
- coord_flip() +
+ coord_flip() + labs(x= 'Director', y= 'Movie_Count')
  theme_minimal()
+
+ 
+
+#Top Actors
+ 
+ 
+head(movie_data)
+esquisse::esquisser(movie_data)
+
+movie_data1 <- movie_data %>%
+ filter(!is.na(budget)) %>%
+ filter(!is.na(id))
+
+top_act <- movie_data %>% filter(!is.na(movie_data$actor_1)) %>% count(actor_1) %>% top_n(n = 25)
+top_act
+
+ggplot(top_act)+  aes(reorder(x=actor_1, n),  weight = n ) + geom_bar(fill = '#0c4c8a')+ coord_flip() + labs(x= 'Actor', y='Movie-Count')
+
+
+#Highest Rated Movies by Genre
+head(genres1)
+head(movie_data)
+
 
 
 
@@ -255,7 +297,11 @@ ggplot(top_dir) +
 
 ```{r}
 
+
+head(genres)
 ```
+
+
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
