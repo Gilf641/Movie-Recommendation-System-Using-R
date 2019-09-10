@@ -336,6 +336,20 @@ Top_Keywords <- key1 %>% ggplot(aes(x=reorder(keyword,n), weight = n) ) + geom_b
 ```
 
 ```{r}
+# WORDCLOUD
+
+set.seed(2019)
+
+keywords_counts <- keywords %>% count(keyword)
+
+par(mfrow=c(1, 1),bg="grey97")
+wordcloud(keywords_counts$keyword, keywords_counts$n, max.words = 100, scale=c(1.0,.5), random.color = TRUE, random.order=FALSE, rot.per=0, colors=brewer.pal(9,"Set1"))
+
+
+
+```
+
+```{r}
 
 
 colnames(movie_data)
