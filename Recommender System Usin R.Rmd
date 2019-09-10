@@ -285,12 +285,43 @@ top_act
 ggplot(top_act)+  aes(reorder(x=actor_1, n),  weight = n ) + geom_bar(fill = '#0c4c8a')+ coord_flip() + labs(x= 'Actor', y='Movie-Count')
 
 
-#Highest Rated Movies by Genre
+#Highest Num of Movies by Genre
 head(genres1)
 head(movie_data)
 
+top_gen <- movie_data %>% filter(!is.na(movie_data$genre_1)) %>% count(genre_1) %>% top_n(30)
+ggplot(top_gen) + aes(reorder(x=genre_1, n), weight = n) + geom_bar(fill='#0c4c8a')+coord_flip()+labs(x='Genres', y='Movie-Count') + labs(title = 'Top Genres')
 
 
+#Highest Rated Movies by Genre
+
+#first of all we need join the entire genre thing according to id using left join
+
+genre500 <- left_join(genres, movie_data %>% filter(vote_count > 250) %>% select(id,original_title, original_language, vote_count, vote_average ), by = 'id')
+
+head(genre500)
+tail(genre500)
+
+summary(genre500)
+
+
+genre500 <- genre500 %>% filter(!is.na(genre500$original_title))
+genre500  <- genre500 %>% filter(!genres %in% c('Foreign', 'TV Movie'))
+
+g250 <- genre500 %>% group_by(genres) %>% arrange(desc(vote_average)) %>% slice(1:10)
+#%>% 
+ # ggplot(x=reorder(genres, vote_average), y=vote_average )+ geom_col(aes(fill = 'genres'))+ coord_flip()+
+  #facet_wrap(~genres)
+
+esquisse::esquisser(g250)
+
+
+ggplot(g250) +
+ aes(x = reorder(original_title, vote_average), weight = vote_average) +
+ geom_bar(fill = "#0c4c8a") +
+ coord_flip() +
+ theme_minimal() +       labs(x="", y="") +
+ facet_wrap(vars(genres), scales = "free")
 
 
 ```
@@ -298,7 +329,11 @@ head(movie_data)
 ```{r}
 
 
-head(genres)
+colnames(movie_data)
+
+str(genres)
+?facet_wrap
+
 ```
 
 
