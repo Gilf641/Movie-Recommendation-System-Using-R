@@ -324,6 +324,15 @@ ggplot(g250) +
  facet_wrap(vars(genres), scales = "free")
 
 
+
+#keyword viz
+
+head(keywords)
+key1 <- keywords %>% count(keyword) %>% top_n(20)
+Top_Keywords <- key1 %>% ggplot(aes(x=reorder(keyword,n), weight = n) ) + geom_bar(fill = '#0c4c8a') + coord_flip() +
+  labs(title ='Top Keywords', x= 'Keywords',y='Keyword Count')
+
+
 ```
 
 ```{r}
