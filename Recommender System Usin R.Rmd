@@ -46,7 +46,6 @@ require(esquisse)
 
 #\\\-------DATA UNDERSTANDING-------
 glimpse(movie_data)
-table(movie_data$genres)
 
 
 #\\\------DATA PREPARATION--------
@@ -67,7 +66,7 @@ keywords <- movie_data %>%
   select(id, title, keyword=name) %>%   # select the columns we want
   mutate_if(is.character, factor)
 
-keywords
+#--keywords
 
 
 movie_data$genres <- as.character(movie_data$genres)
@@ -129,7 +128,7 @@ cast <- credits_data %>%
 glimpse(cast)
 glimpse(credits_data)
 
-kable(cast %>% filter(actor == 'Leonardo DiCaprio'))
+#kable(cast %>% filter(actor == 'Leonardo DiCaprio'))
 
 
 #Data Understanding for Cast
@@ -268,7 +267,6 @@ ggplot(top_dir) +
  theme_minimal()
 
  
-
 #Top Actors
  
  
@@ -343,19 +341,51 @@ set.seed(2019)
 keywords_counts <- keywords %>% count(keyword)
 
 par(mfrow=c(1, 1),bg="grey97")
-wordcloud(keywords_counts$keyword, keywords_counts$n, max.words = 100, scale=c(1.0,.5), random.color = TRUE, random.order=FALSE, rot.per=0, colors=brewer.pal(9,"Set1"))
 
+wordcloud(keywords_counts$keyword, keywords_counts$n, max.words = 100, scale=c(1.2,.5), random.color = TRUE, random.order=FALSE, rot.per=0, colors=brewer.pal(9,"Set1"))
+
+?par
 
 
 ```
 
 ```{r}
 
+#IMDB Rating
 
-colnames(movie_data)
+# Weighted Rating = (Avg Votes for the movie * Total No of Votes for the movie) + (mean vote for the movie* min votes for the movie) /(min votes + Total No of Votes)
 
-str(genres)
-?facet_wrap
+#Parameters
+# C - Mean Vote for the movie
+# M - Min Votes
+# R - Avg Votes for the movie
+# T - Total No of the votes for the movie
+
+C <- mean(movie_data$vote_average)
+
+M <- quantile(movie_data$vote_count, 0.75)
+
+#weighted rating col
+movie_data$weighted_rating <- (movie_data$vote_average * movie_data$vote_count)+(C*M)/(M + movie_data$vote_count)
+head(movie_data$weighted_rating)
+movie_data$weighted_rating <- movie_data$weighted_rating/10000
+
+options(scipen = 99)
+
+head(movie_data$weighted_rating)
+tail(movie_data$weighted_rating)
+
+
+movie_data %>% top_n(100, wt=weighted_rating) %>%
+        ggplot(aes(x=reorder(title, weighted_rating), y=weighted_rating/10000)) +
+        geom_bar(stat='identity', fill="blue") + coord_flip() +
+        labs(x="", y="Weighted Rating")+
+        geom_text(aes(label=round(weighted_rating, 2)), hjust=-0.1, size=3) +
+        scale_y_continuous(breaks=seq(0, 10)) +
+        geom_text(aes(label=paste("Votes:", vote_count, "Vote Average:", vote_average)), y=2.3, size=3, col="yellow")
+
+
+movie_data$weighted_rating
 
 ```
 
