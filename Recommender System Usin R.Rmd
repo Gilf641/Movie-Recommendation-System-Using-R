@@ -305,9 +305,12 @@ summary(genre500)
 
 genre500 <- genre500 %>% filter(!is.na(genre500$original_title))
 genre500  <- genre500 %>% filter(!genres %in% c('Foreign', 'TV Movie'))
+genre500
 
 g250 <- genre500 %>% group_by(genres) %>% arrange(desc(vote_average)) %>% slice(1:10)
 #%>% 
+
+g250
  # ggplot(x=reorder(genres, vote_average), y=vote_average )+ geom_col(aes(fill = 'genres'))+ coord_flip()+
   #facet_wrap(~genres)
 
@@ -386,6 +389,33 @@ movie_data %>% top_n(100, wt=weighted_rating) %>%
 
 
 movie_data$weighted_rating
+
+```
+
+```{r}
+#head(movie_data)
+
+
+g250
+g500
+
+#LEFT JOIN WEIGHTED RATING TO G1000 
+g1000 <- left_join(g500, movie_data %>% select(id, weighted_rating), by = 'id')
+g1000
+
+
+recommend_fuckinmovies <- function(Genre, Language = 'en'){
+  g1000 %>% filter(original_language == Language & genres== Genre) %>%
+    arrange(desc(weighted_rating)) %>% slice(1:10)
+  
+  
+    }
+
+movie_data %>% filter(genre_1 == 'Drama') %>%
+    arrange(desc(weighted_rating)) %>% slice(1:10)
+
+#this is wrong 
+
 
 ```
 
