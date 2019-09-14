@@ -21,6 +21,20 @@ str(credits_data)
 ```
 
 ```{r}
+head(movie_data)
+tail(movie_data)
+
+
+
+
+
+```
+
+```{r}
+
+```
+
+```{r}
 #Load all the required libraries
 
 require(tidyverse)
@@ -167,6 +181,15 @@ cast <- cast %>% filter(order %in% c(0, 1, 2, 3, 4)) %>%
 # dataframe with top 5 actors for each movie
 movies <- left_join(movie_data, cast %>% select(id=movie_id, actor_1, actor_2, actor_3, actor_4, actor_5), by = "id")
 glimpse(movies)
+
+
+```
+
+```{r}
+
+head(credits_data)
+head(cast)
+
 
 
 ```
@@ -400,23 +423,37 @@ g250
 g500
 
 #LEFT JOIN WEIGHTED RATING TO G1000 
-g1000 <- left_join(g500, movie_data %>% select(id, weighted_rating), by = 'id')
-g1000
 
 
-recommend_fuckinmovies <- function(Genre, Language = 'en'){
-  g1000 %>% filter(original_language == Language & genres== Genre) %>%
-    arrange(desc(weighted_rating)) %>% slice(1:10)
-  
-  
-    }
+genres2500 <- left_join(g500, movie_data %>% select(id, weighted_rating), by="id")
 
-movie_data %>% filter(genre_1 == 'Drama') %>%
-    arrange(desc(weighted_rating)) %>% slice(1:10)
+head(genres2500)
 
-#this is wrong 
+recommendGenreLanguage <- function(Genre, Language="en") {
+        genres2500 %>% filter(original_language==Language & genres==Genre) %>%
+                arrange(desc(weighted_rating)) %>% select(title, vote_average) %>%
+    unique() %>% slice(1:10)
+}
 
 
+recommendGenreLanguage('Drama')
+
+movie_data %>% filter(genre_1 == 'Action') %>%
+    arrange(desc(weighted_rating))  %>% select(title, vote_average) %>% unique() %>% slice(1:5)
+
+
+```
+
+```{r}
+genres2500 <- left_join(g500, movie_data %>% select(id, weighted_rating), by="id")
+
+recommendGenreLanguage <- function(Genre, Language="en") {
+        genres2500 %>% filter(original_language==Language & genres==Genre) %>%
+                arrange(desc(weighted_rating)) %>% slice(1:5)
+}
+
+
+recommendGenreLanguage('Drama')
 ```
 
 
