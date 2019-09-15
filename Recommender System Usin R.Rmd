@@ -419,9 +419,6 @@ movie_data$weighted_rating
 #head(movie_data)
 
 
-g250
-g500
-
 #LEFT JOIN WEIGHTED RATING TO G1000 
 
 
@@ -431,15 +428,14 @@ head(genres2500)
 
 recommendGenreLanguage <- function(Genre, Language="en") {
         genres2500 %>% filter(original_language==Language & genres==Genre) %>%
-                arrange(desc(weighted_rating)) %>% select(title, vote_average) %>%
-    unique() %>% slice(1:10)
-}
+                arrange(desc(weighted_rating)) %>%select(-c(id,genres, vote_count,vote_average)) %>% unique() %>% slice(1:10)
+  }
 
 
 recommendGenreLanguage('Drama')
+recommendGenreLanguage('Action')
 
-movie_data %>% filter(genre_1 == 'Action') %>%
-    arrange(desc(weighted_rating))  %>% select(title, vote_average) %>% unique() %>% slice(1:5)
+#done and dusted !
 
 
 ```
