@@ -139,8 +139,6 @@ cast <- credits_data %>%
   mutate_if(is.character, factor)
 
 
-glimpse(cast)
-glimpse(credits_data)
 
 #kable(cast %>% filter(actor == 'Leonardo DiCaprio'))
 
@@ -155,7 +153,7 @@ glimpse(credits_data)
 #7. actor: Name of the actor playing that particular role in that corresponding film
 #8. order: Significance of that character in that particular film.
 
-glimpse(cast)
+#glimpse(cast)
 
 h1 <- cast %>% filter(order %in% c(0,1,2)) %>% select(title, character, actor, order) 
 
@@ -180,7 +178,7 @@ cast <- cast %>% filter(order %in% c(0, 1, 2, 3, 4)) %>%
 
 # dataframe with top 5 actors for each movie
 movies <- left_join(movie_data, cast %>% select(id=movie_id, actor_1, actor_2, actor_3, actor_4, actor_5), by = "id")
-glimpse(movies)
+#glimpse(movies)
 
 
 ```
@@ -441,6 +439,10 @@ recommendGenreLanguage('Action')
 ```
 
 ```{r}
+
+```
+
+```{r}
 genres2500 <- left_join(g500, movie_data %>% select(id, weighted_rating), by="id")
 
 recommendGenreLanguage <- function(Genre, Language="en") {
@@ -450,6 +452,108 @@ recommendGenreLanguage <- function(Genre, Language="en") {
 
 
 recommendGenreLanguage('Drama')
+```
+
+
+```{r}
+
+similar_factors <- c('actor_1', 'actor_2', 'actor_3','actor_4', 'director', 'genre_1', 'genre_2', 'genre_3')
+
+movies_filter <- movie_data %>% select(id, title, !!similar_factors)
+movies_filter <- movies_filter %>% mutate_if(is.factor, as.character)
+movfilter <- movies_filter #duplicate
+
+
+
+recommend_similarMovies <- function(Movie){
+  director <- movies_filter$director[movies_filter$id == Movie]
+actor_1 <- movies_filter$actor_1[movies_filter$id == Movie]
+actor_2 <- movies_filter$actor_2[movies_filter$id == Movie]
+actor_3 <- movies_filter$actor_3[movies_filter$id == Movie]
+actor_4 <- movies_filter$actor_4[movies_filter$id == Movie]
+genre_1 <- movies_filter$genre_1[movies_filter$id == Movie]
+genre_2 <- movies_filter$genre_2[movies_filter$id == Movie]
+genre_3 <- movies_filter$genre_3[movies_filter$id == Movie]
+
+
+#copy
+recomdn_df <- movies_filter
+
+#create new columns
+recomdn_df$same_act1 <- NA
+recomdn_df$same_act2 <- NA
+recomdn_df$same_act3 <- NA
+recomdn_df$same_act4 <- NA
+recomdn_df$same_gen1 <- NA
+recomdn_df$same_gen2 <- NA
+recomdn_df$same_gen3 <- NA
+recomdn_df$same_dir <- NA
+
+
+recomdn_df$same_dir <- ifelse(recomdn_df$dir == director, 1, 0)
+
+recomdn_df$same_act1 <- 
+  ifelse(recomdn_df$actor_1 == actor_1 |recomdn_df$actor_2 == actor_1 |recomdn_df$actor_3 == actor_1 |recomdn_df$actor_4 == actor_1 , 1, 0)
+
+
+recomdn_df$same_act2 <- 
+  ifelse(recomdn_df$actor_1 == actor_2 |recomdn_df$actor_2 == actor_2 |recomdn_df$actor_3 == actor_2 |recomdn_df$actor_4 == actor_2 , 1, 0)
+
+
+
+recomdn_df$same_act3 <- 
+  ifelse(recomdn_df$actor_1 == actor_3 |recomdn_df$actor_2 == actor_3 |recomdn_df$actor_3 == actor_3 |recomdn_df$actor_4 == actor_3 , 1, 0)
+
+
+
+recomdn_df$same_act4<- 
+  ifelse(recomdn_df$actor_1 == actor_4 |recomdn_df$actor_2 == actor_4 |recomdn_df$actor_3 == actor_4 |recomdn_df$actor_4 == actor_4 , 1, 0)
+
+
+
+recomdn_df$same_gen1 <- 
+  ifelse(recomdn_df$genre_1 == genre_1 |recomdn_df$genre_2 == genre_1 |recomdn_df$genre_3 == genre_1 , 1, 0)
+
+
+recomdn_df$same_gen2 <- 
+  ifelse(recomdn_df$genre_1 == genre_2 |recomdn_df$genre_2 == genre_2 |recomdn_df$genre_3 == genre_2 , 1, 0)
+
+
+recomdn_df$same_gen3 <- 
+  ifelse(recomdn_df$genre_1 == genre_3 |recomdn_df$genre_2 == genre_3 |recomdn_df$genre_3 == genre_3 , 1, 0)
+
+
+#I've to figure out what this line does exactly
+recomdn_df <- recomdn_df %>% mutate_at(vars("same_dir": "same_gen3"), list(~replace(., is.na(.), 0)))
+
+
+#similarity count/index
+recomdn_df$simcount <- NULL
+#left join the id and weighted rating 
+
+final_recdf <- left_join(recomdn_df, movie_data %>% select(id, weighted_rating), by = 'id')
+
+TopRecommendations <- final_recdf %>% arrange(desc(weighted_rating)) %>% slice(1:11) %>% select(id, weighted_rating, title, actor_1, actor_2, actor_3, director, genre_1, genre_2, genre_3)
+
+
+}
+
+#this s wron
+```
+
+```{r}
+
+recommend_similarMovies(597)
+
+warnings()
+```
+
+```{r}
+head(movies_filter)
+colnames(movie_data)
+
+?mutate_at
+
 ```
 
 
