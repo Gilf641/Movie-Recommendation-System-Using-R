@@ -7,28 +7,20 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
-getwd()
-#read the file
+
+#read the movie file
 movie_data <- read.csv('tmdb_5000_movies.csv')
 str(movie_data)
 
-
+#read the credits file
 credits_data <- read.csv('tmdb_5000_credits.csv')
-#head(credits_data)
+head(credits_data)
 str(credits_data)
 
 
 ```
 
 ```{r}
-head(movie_data)
-tail(movie_data)
-
-
-
-
-
-```
 
 ```{r}
 
